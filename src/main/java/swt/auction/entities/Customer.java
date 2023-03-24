@@ -21,10 +21,19 @@ public class Customer {
   private String lastName;
 
   @Embedded
+  @AttributeOverrides({
+    @AttributeOverride( name = "zipCode", column = @Column(name = "shippingCode")),
+    @AttributeOverride( name = "city", column = @Column(name = "shippingCity")),
+    @AttributeOverride( name = "street", column = @Column(name = "shippingStreet"))
+  })
   private Address shippingAddress;
 
   @Embedded
-  private Address paymentAddress;
+  @AttributeOverrides({
+    @AttributeOverride( name = "zipCode", column = @Column(name = "paymentCode")),
+    @AttributeOverride( name = "city", column = @Column(name = "paymentCity")),
+    @AttributeOverride( name = "street", column = @Column(name = "paymentStreet"))
+  })  private Address paymentAddress;
 
   @OneToMany(mappedBy = "buyer")
   private List<Article> boughtArticles;
