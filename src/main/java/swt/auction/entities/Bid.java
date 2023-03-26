@@ -10,11 +10,7 @@ import java.time.*;
 @Setter
 @ToString
 @NoArgsConstructor
-public class Bid {
-
-  @Id
-  @GeneratedValue
-  private Long id;
+public class Bid extends BaseEntity {
 
   private LocalDateTime date;
 

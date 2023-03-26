@@ -40,7 +40,7 @@ public class Main {
     System.out.println(availCmds);
     String userCmd = promptFor(in, "");
 
-    Repository<Customer, Long> customerRepo = new CustomerRepository(JpaUtil.getTransactionalEntityManager());
+    Repository<Customer> customerRepo = new CustomerRepository(JpaUtil.getTransactionalEntityManager());
 
     try {
 
@@ -55,7 +55,7 @@ public class Main {
             break;
 
           case "findById":
-            System.out.println(customerRepo.findById(Long.parseLong(promptFor(in, "id"))));
+            System.out.println(customerRepo.find(Long.parseLong(promptFor(in, "id"))));
             break;
 
 

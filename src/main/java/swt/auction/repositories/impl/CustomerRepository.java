@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import swt.auction.entities.*;
 import swt.auction.repositories.*;
 
-public class CustomerRepository extends Repository<Customer, Long> {
+public class CustomerRepository extends Repository<Customer> {
 
   public CustomerRepository(EntityManager entityManager) {
     super(Customer.class, entityManager);

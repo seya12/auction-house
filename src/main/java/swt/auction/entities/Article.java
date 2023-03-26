@@ -11,11 +11,7 @@ import java.util.*;
 @Setter
 @ToString
 @NoArgsConstructor
-public class Article {
-
-  @Id
-  @GeneratedValue
-  private Long id;
+public class Article extends BaseEntity{
 
   private String name;
 
@@ -30,13 +26,18 @@ public class Article {
   private LocalDateTime auctionEndDate;
 
   @ManyToOne
+  @ToString.Exclude
   private Customer buyer;
 
   @ManyToOne
+  @ToString.Exclude
   private Customer seller;
 
   @OneToMany(mappedBy = "article")
+  @ToString.Exclude
   private List<Bid> bids;
 
+  @Enumerated
+  private ArticleStatus status;
 
 }

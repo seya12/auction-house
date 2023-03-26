@@ -2,6 +2,8 @@ package swt.auction.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.*;
+import org.hibernate.annotations.CascadeType;
 
 import java.util.*;
 
@@ -9,12 +11,10 @@ import java.util.*;
 @Getter
 @Setter
 @ToString
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
-public class Customer {
-
-  @Id
-  @GeneratedValue
-  private Long Id;
+public class Customer extends BaseEntity {
 
   private String firstName;
 
@@ -35,14 +35,21 @@ public class Customer {
     @AttributeOverride( name = "street", column = @Column(name = "paymentStreet"))
   })  private Address paymentAddress;
 
-  @OneToMany(mappedBy = "buyer")
+  @OneToMany(mappedBy = "buyer", orphanRemoval=true)
+  @Cascade(CascadeType.ALL)
+  @ToString.Exclude
   private List<Article> boughtArticles;
 
-  @OneToMany(mappedBy = "seller")
+  @OneToMany(mappedBy = "seller", orphanRemoval=true)
+  @Cascade(CascadeType.ALL)
+  @ToString.Exclude
   private List<Article> soldArticles;
 
-  @Enumerated
-  private ArticleStatus status;
-
-
+  public void addBoughtArticle(Article article){
+    if(article.getBuyer() != null){
+      article.getBuyer().boughtArticles.remove(article);
+    }
+    article.setBuyer(this);
+    boughtArticles.add(article);
+  }
 }
