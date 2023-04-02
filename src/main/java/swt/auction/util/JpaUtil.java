@@ -29,6 +29,14 @@ public class JpaUtil {
     if (tx.isActive()) tx.commit();
   }
 
+  public static void commitAndBegin(EntityManager em) {
+    var tx = em.getTransaction();
+    if (tx.isActive()){
+      tx.commit();
+      tx.begin();
+    }
+  }
+
   public static void rollback(EntityManager em) {
     var tx = em.getTransaction();
     if (tx.isActive()) tx.rollback();

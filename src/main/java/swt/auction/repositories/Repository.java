@@ -21,6 +21,9 @@ public abstract class Repository<T extends BaseEntity> {
   }
 
   public T find(Long primaryKey) {
+    if(primaryKey == null){
+      return null;
+    }
     return (T) entityManager.find(type, primaryKey);
   }
 
@@ -33,12 +36,20 @@ public abstract class Repository<T extends BaseEntity> {
 
   }
 
-  public void delete(T entity) {
-    entityManager.remove(entityManager.contains(entity) ? entity : entityManager.merge(entity));
+  public boolean delete(T entity) {
+    if(entity == null){
+      return false;
+    }
+    return deleteById(entity.getId());
   }
 
   public boolean deleteById(Long primaryKey) {
     var entity = find(primaryKey);
+
+    if(entity == null) {
+      return false;
+    }
+
     entityManager.remove(entity);
     return true;
   }

@@ -23,6 +23,10 @@ public class CustomerTests {
   void init() {
     entityManager = JpaUtil.getTransactionalEntityManager();
     customerRepository = new CustomerRepository(entityManager);
+
+    entityManager.createQuery("delete from Article ").executeUpdate();
+    entityManager.createQuery("delete from Customer").executeUpdate();
+    JpaUtil.commitAndBegin(entityManager);
   }
 
   @Test
@@ -42,6 +46,19 @@ public class CustomerTests {
   }
 
   @Test
+  void findAllCustomersWhenNoExistSizeIsZero() {
+    assertThat(customerRepository.findAll().size()).isEqualTo(0);
+  }
+
+  @Test
+  void findAllCustomersWhenTwoExistSizeIsTwo() {
+    getDefaultCustomer();
+    getDefaultCustomer();
+
+    assertThat(customerRepository.findAll().size()).isEqualTo(2);
+  }
+
+  @Test
   void saveCustomersWhenNewAreFound() {
     Customer customerOne = getDefaultCustomer();
     Customer customerTwo = getDefaultCustomer();
@@ -55,21 +72,28 @@ public class CustomerTests {
   }
 
   @Test
-  void updateCustomerFieldsAreUpdated(){
+  void updateCustomerFieldsAreUpdated() {
     Customer customer = getDefaultCustomer();
-    customer.setLastName("Test");
-    Article newArticle = new Article();
-    customer.addBoughtArticle(newArticle);
 
+    customer.setLastName("Test");
+    Article newBoughtArticle = new Article();
+    Article newSoldArticle = new Article();
+    customer.addBoughtArticle(newBoughtArticle);
+    customer.addSoldArticle(newSoldArticle);
     var updatedEntity = customerRepository.update(customer);
+
 
     assertAll(
       () -> assertThat(customer.getLastName()).isEqualTo(updatedEntity.getLastName()),
-      () -> assertThat(updatedEntity.getBoughtArticles().size()).isEqualTo(1));
+      () -> assertThat(updatedEntity.getBoughtArticles().size()).isEqualTo(1),
+      () -> assertThat(updatedEntity.getBoughtArticles().get(0).getId()).isNotNull(),
+      () -> assertThat(updatedEntity.getSoldArticles().size()).isEqualTo(1),
+      () -> assertThat(updatedEntity.getSoldArticles().get(0).getId()).isNotNull()
+             );
   }
 
   @Test
-  void removeWhenCustomerFoundThenDelete(){
+  void removeWhenCustomerFoundThenDelete() {
     Customer customer = getDefaultCustomer();
 
     customerRepository.delete(customer);
@@ -78,25 +102,47 @@ public class CustomerTests {
   }
 
   @Test
-  void removeWhenNoCustomerFoundThenNoCustomerDeleted(){
+  void removeWhenNoCustomerFoundThenNoCustomerDeleted() {
     Customer customer = getDefaultCustomer();
 
+    int sizeBefore = customerRepository.findAll().size();
     customerRepository.delete(new Customer());
+    int sizeAfter = customerRepository.findAll().size();
 
-    assertThat(customerRepository.find(customer.getId())).isNotNull();
+    assertThat(sizeBefore).isEqualTo(sizeAfter);
   }
 
+  @Test
+  void removeByIdWhenCustomerFoundThenDelete() {
+    Customer customer = getDefaultCustomer();
+
+    customerRepository.deleteById(customer.getId());
+
+    assertThat(customerRepository.find(customer.getId())).isNull();
+  }
+
+  @Test
+  void removeByIdWhenNoCustomerFoundThenNoCustomerDeleted() {
+    getDefaultCustomer();
+
+    int sizeBefore = customerRepository.findAll().size();
+    customerRepository.deleteById(null);
+    customerRepository.deleteById(51L);
+    int sizeAfter = customerRepository.findAll().size();
+
+    assertThat(sizeBefore).isEqualTo(sizeAfter);
+  }
+  
   @AfterEach
-  void commit(){
-    entityManager.createQuery("delete from Article ").executeUpdate();
-    entityManager.createQuery("delete from Customer").executeUpdate();
-    JpaUtil.commit(entityManager);
+  void close() {
+    entityManager.close();
   }
 
   private Customer getDefaultCustomer() {
-    var customer =  Customer.builder()
+    var customer = Customer.builder()
       .firstName("Max")
       .lastName("Mustermann")
+      .email("max.mustermann@gmail.com")
       .paymentAddress(new Address("4020", "Linz", "Hafenstraße"))
       .shippingAddress(new Address("4040", "Urfahr", "Rieglstraße"))
       .boughtArticles(new ArrayList<>())
@@ -104,12 +150,9 @@ public class CustomerTests {
       .build();
 
     customerRepository.save(customer);
-    JpaUtil.commit(entityManager);
+    JpaUtil.commitAndBegin(entityManager);
     entityManager.detach(customer);
-    entityManager.getTransaction().begin();
 
     return customer;
   }
-
-
 }

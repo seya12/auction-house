@@ -11,7 +11,7 @@ import java.util.*;
 @Setter
 @ToString
 @NoArgsConstructor
-public class Article extends BaseEntity{
+public class Article extends BaseEntity {
 
   private String name;
 
@@ -27,12 +27,12 @@ public class Article extends BaseEntity{
 
   @ManyToOne
   @ToString.Exclude
-  private Customer buyer;
+  private Customer seller;
 
   @ManyToOne
   @ToString.Exclude
-  private Customer seller;
-
+  private Customer buyer;
+  
   @OneToMany(mappedBy = "article")
   @ToString.Exclude
   private List<Bid> bids;

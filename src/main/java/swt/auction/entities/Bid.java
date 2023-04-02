@@ -12,6 +12,8 @@ import java.time.*;
 @NoArgsConstructor
 public class Bid extends BaseEntity {
 
+  private double bid;
+  
   private LocalDateTime date;
 
   @OneToOne
