@@ -1,152 +1,112 @@
 package swt.auction.main;
 
 import swt.auction.entities.*;
-import swt.auction.repositories.*;
 import swt.auction.repositories.impl.*;
 import swt.auction.util.*;
 
 import java.io.*;
-import java.time.format.*;
 
 public class Main {
 
-  static String promptFor(BufferedReader in, String p) {
+  private static BufferedReader in;
+
+  static String promptFor(String p) {
     System.out.print(p + "> ");
     System.out.flush();
     try {
       return in.readLine();
     } catch (Exception e) {
-      return promptFor(in, p);
+      return promptFor(p);
     }
   }
 
-  static Customer readCustomerFromCmdLine() {
-    BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-    String firstName = promptFor(in, "firstName");
-    String lastName = promptFor(in, "lastName");
-//    LocalDate dateOfBirth = LocalDate.parse(promptFor(in, "dob (dd.mm.yyyy)"), formatter);
-
-    return new Customer();
-  }
-
-
   public static void main(String[] args) {
-
-    BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-    String availCmds = "commands: quit, list, insert, findById, " +
-                       "findByLastName, update, delete";
-
-    System.out.println("Hibernate Employee Admin");
+    in = new BufferedReader(new InputStreamReader(System.in));
+    String availCmds = "commands: crud, insights, quit";
     System.out.println(availCmds);
-    String userCmd = promptFor(in, "");
-
-    Repository<Customer> customerRepo = new CustomerRepository(JpaUtil.getTransactionalEntityManager());
+    String userCmd = promptFor("");
 
     try {
-
       while (!userCmd.equals("quit")) {
-
         switch (userCmd) {
           case "crud":
-            crud(in, "");
+            crud();
             break;
 
           case "insights":
-            insights(in, "");
-            break;
-
-          case "list":
-            for (Customer customer : customerRepo.findAll()) {
-              System.out.println(customer);
-            }
-            break;
-
-          case "findById":
-            System.out.println(customerRepo.find(Long.parseLong(promptFor(in, "id"))));
-            break;
-
-
-          case "insert":
-            try {
-              customerRepo.save(readCustomerFromCmdLine());
-            } catch (DateTimeParseException e) {
-              System.err.println("Invalid date format.");
-            }
-
-            break;
-
-//          case "update":
-//            try {
-//              boolean success =
-//                updateEmployee(
-//                  Long.parseLong(promptFor(in, "id")),
-//                  promptFor(in, "firstName"),
-//                  promptFor(in, "lastName"),
-//                  LocalDate.parse(promptFor(in, "dob (dd.mm.yyyy)"), formatter));
-//              System.out.println(success ? "employee updated" : "employee not found");
-//            } catch (DateTimeParseException e) {
-//              System.err.println("Invalid date format.");
-//            }
-//            break;
-
-          case "delete":
-            boolean success = customerRepo.deleteById(Long.parseLong(promptFor(in, "id")));
-            System.out.println(success ? "employee deleted" : "employee not found");
+            insights();
             break;
 
           default:
             System.out.println("ERROR: invalid command");
             break;
-        } // switch
-
+        }
         System.out.println(availCmds);
-        userCmd = promptFor(in, "");
-      } // while
+        userCmd = promptFor("");
+      }
 
-    } // try
-    catch (Exception ex) {
+    } catch (Exception ex) {
       ex.printStackTrace();
-    } // catch
-    finally {
-      // TODO: HibernateUtil.closeSessionFactory();
+    } finally {
+      JpaUtil.closeEntityManagerFactory();
     }
   }
 
 
-  private static void crud(BufferedReader in, String p) {
-    String availCmds = "commands: customer i, customer d, article i, article d, bid i, bid d, quit";
+  private static void crud() {
+    String availCmds = "commands: 1 (customer insert), 2 (customer delete), 3 (article insert), 4 (article delete), 5" +
+                       " (bid insert), 6 (bid delete), quit";
     System.out.println(availCmds);
 
-    String userCmd = promptFor(in, "");
+    String userCmd = promptFor("");
     while (!"quit".equals(userCmd)) {
       switch (userCmd) {
-        case "customer i":
+        case "1":
+          customerInsert();
           break;
-        case "customer d":
+        case "2":
+          System.out.println(
+
+                            );
+        case "3":
           break;
-        case "article i":
+        case "4":
           break;
-        case "article d":
+        case "5":
           break;
-        case "bid i":
-          break;
-        case "bid d":
+        case "6":
           break;
         default:
           System.out.println("ERROR: invalid command");
           break;
       }
       System.out.println(availCmds);
-      userCmd = promptFor(in, "");
+      userCmd = promptFor("");
     }
   }
 
-  private static void insights(BufferedReader in, String p) {
+  private static void customerInsert() {
+    Customer customer = Customer.builder()
+      .firstName(promptFor("firstName"))
+      .lastName(promptFor("lastName"))
+      .email(promptFor("email"))
+      .shippingAddress(new Address(promptFor("shippingCode"), promptFor("shippingCity"), promptFor("shippingStreet")))
+      .paymentAddress(new Address(promptFor("paymentCode"), promptFor("paymentCity"), promptFor("paymentStreet")))
+      .build();
+    JpaUtil.execute(em -> new CustomerRepository(em).save(customer));
+  }
+
+  private static boolean customerDelete() {
+    var id = Long.parseLong(promptFor("ID"));
+    return JpaUtil.executeWithResult(em -> new ArticleRepository(em).deleteById(id));
+  }
+
+  private static void insights() {
     String availCmds = "commands: 1 (findArticlesByDescriptions), 2 (getArticlePrice), 3 (getTopSellers), 4 " +
                        "(getTopArticles), quit";
     System.out.println(availCmds);
 
-    String userCmd = promptFor(in, "");
+    String userCmd = promptFor("");
     while (!"quit".equals(userCmd)) {
       switch (userCmd) {
         case "1":
@@ -162,7 +122,7 @@ public class Main {
           break;
       }
       System.out.println(availCmds);
-      userCmd = promptFor(in, "");
+      userCmd = promptFor("");
     }
   }
 
