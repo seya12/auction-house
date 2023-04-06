@@ -47,6 +47,13 @@ public class Main {
       while (!userCmd.equals("quit")) {
 
         switch (userCmd) {
+          case "crud":
+            crud(in, "");
+            break;
+
+          case "insights":
+            insights(in, "");
+            break;
 
           case "list":
             for (Customer customer : customerRepo.findAll()) {
@@ -104,4 +111,59 @@ public class Main {
       // TODO: HibernateUtil.closeSessionFactory();
     }
   }
+
+
+  private static void crud(BufferedReader in, String p) {
+    String availCmds = "commands: customer i, customer d, article i, article d, bid i, bid d, quit";
+    System.out.println(availCmds);
+
+    String userCmd = promptFor(in, "");
+    while (!"quit".equals(userCmd)) {
+      switch (userCmd) {
+        case "customer i":
+          break;
+        case "customer d":
+          break;
+        case "article i":
+          break;
+        case "article d":
+          break;
+        case "bid i":
+          break;
+        case "bid d":
+          break;
+        default:
+          System.out.println("ERROR: invalid command");
+          break;
+      }
+      System.out.println(availCmds);
+      userCmd = promptFor(in, "");
+    }
+  }
+
+  private static void insights(BufferedReader in, String p) {
+    String availCmds = "commands: 1 (findArticlesByDescriptions), 2 (getArticlePrice), 3 (getTopSellers), 4 " +
+                       "(getTopArticles), quit";
+    System.out.println(availCmds);
+
+    String userCmd = promptFor(in, "");
+    while (!"quit".equals(userCmd)) {
+      switch (userCmd) {
+        case "1":
+          break;
+        case "2":
+          break;
+        case "3":
+          break;
+        case "4":
+          break;
+        default:
+          System.out.println("ERROR: invalid command");
+          break;
+      }
+      System.out.println(availCmds);
+      userCmd = promptFor(in, "");
+    }
+  }
+
 }

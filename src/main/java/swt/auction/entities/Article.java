@@ -32,8 +32,8 @@ public class Article extends BaseEntity {
   @ManyToOne
   @ToString.Exclude
   private Customer buyer;
-  
-  @OneToMany(mappedBy = "article")
+
+  @OneToMany(mappedBy = "article", fetch = FetchType.EAGER)
   @ToString.Exclude
   private List<Bid> bids;
 
