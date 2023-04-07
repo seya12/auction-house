@@ -78,8 +78,9 @@ public class CustomerTests {
     customer.setLastName("Test");
     Article newBoughtArticle = new Article();
     Article newSoldArticle = new Article();
-    customer.addBoughtArticle(newBoughtArticle);
-    customer.addSoldArticle(newSoldArticle);
+    newBoughtArticle.addBuyer(customer);
+    newSoldArticle.addSeller(customer);
+
     var updatedEntity = customerRepository.update(customer);
 
 
@@ -103,7 +104,7 @@ public class CustomerTests {
 
   @Test
   void removeWhenNoCustomerFoundThenNoCustomerDeleted() {
-    Customer customer = getDefaultCustomer();
+    getDefaultCustomer();
 
     int sizeBefore = customerRepository.findAll().size();
     customerRepository.delete(new Customer());
@@ -132,7 +133,7 @@ public class CustomerTests {
 
     assertThat(sizeBefore).isEqualTo(sizeAfter);
   }
-  
+
   @AfterEach
   void close() {
     entityManager.close();

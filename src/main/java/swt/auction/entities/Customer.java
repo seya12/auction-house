@@ -54,23 +54,4 @@ public class Customer extends BaseEntity {
   @ToString.Exclude
   private List<Article> soldArticles;
 
-  public void addBoughtArticle(Article article) {
-    if (article.getBuyer() != null) {
-      article.getBuyer().boughtArticles.remove(article);
-    }
-    article.setBuyer(this);
-    boughtArticles.add(article);
-  }
-
-  public void addSoldArticle(Article article) {
-    if (article.getSeller() != null) {
-      article.getSeller().soldArticles.remove(article);
-    }
-    article.setSeller(this);
-    soldArticles.add(article);
-  }
-
-  public void addPaymentOption() {
-
-  }
 }

@@ -10,10 +10,12 @@ import java.time.*;
 @Setter
 @ToString
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Bid extends BaseEntity {
 
   private double bid;
-  
+
   private LocalDateTime date;
 
   @OneToOne
@@ -22,5 +24,20 @@ public class Bid extends BaseEntity {
 
   @ManyToOne
   private Article article;
+
+  public void addArticle(Article article) {
+    if (article != null && article.getBids() != null) {
+      article.getBids().remove(this);
+    }
+    this.article = article;
+    article.getBids().add(this);
+  }
+
+  public void removeArticle() {
+    if (article != null && article.getBids() != null) {
+      article.getBids().remove(this);
+    }
+    article = null;
+  }
 
 }
