@@ -44,13 +44,13 @@ public class Customer extends BaseEntity {
   private List<PaymentOption> paymentOptions;
 
 
-  @OneToMany(mappedBy = "buyer", orphanRemoval = true)
-  @Cascade(CascadeType.ALL)
+  @OneToMany(mappedBy = "buyer")
+  @Cascade({CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
   @ToString.Exclude
   private List<Article> boughtArticles;
 
-  @OneToMany(mappedBy = "seller", orphanRemoval = true)
-  @Cascade(CascadeType.ALL)
+  @OneToMany(mappedBy = "seller")
+  @Cascade({CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
   @ToString.Exclude
   private List<Article> soldArticles;
 

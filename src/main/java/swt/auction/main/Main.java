@@ -24,6 +24,7 @@ public class Main {
   }
 
   public static void main(String[] args) {
+    JpaUtil.getEntityManagerFactory();
     in = new BufferedReader(new InputStreamReader(System.in));
     String availCmds = "commands: crud, insights, quit";
     System.out.println(availCmds);
@@ -46,7 +47,6 @@ public class Main {
       JpaUtil.closeEntityManagerFactory();
     }
   }
-
 
   private static void crud() {
     String availCmds = "commands: 1 (customer insert), 2 (customer delete), 3 (article insert), 4 (article delete), 5" +
