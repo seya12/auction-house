@@ -34,7 +34,7 @@ public class ArticleRepository extends Repository<Article> {
 
   public List<Article> getTopArticles(int count) {
     return entityManager.createQuery("select article from Article article" +
-                                     "    order by article.hammerPrice - article.reservePrice nulls last",
+                                     "    order by article.hammerPrice - article.reservePrice desc nulls last",
         Article.class)
       .setMaxResults(count)
       .getResultList();

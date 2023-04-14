@@ -9,22 +9,25 @@ import java.util.*;
 
 public class Insights {
 
-  public void evaluation() {
-    findArticlesByDescription();
-    getArticlePrice(5);
-    getTopSellers();
-    getTopArticles();
+  private Insights() {
   }
 
-
-  private void findArticlesByDescription() {
-    JpaUtil.executeWithResult(
-      (em) -> new ArticleRepository(em).findArticlesByDescription("test", 0D, ArticleOrder.AUCTION_START_DATE));
+  public static List<Article> findArticlesByDescription(String searchPhrase,
+                                                        Double maxReservePrice,
+                                                        ArticleOrder articleOrder) {
+    return JpaUtil.executeWithResult(
+      (em) -> new ArticleRepository(em).findArticlesByDescription(searchPhrase, maxReservePrice, articleOrder));
 
   }
 
-  private Double getArticlePrice(long id) {
-    var article = JpaUtil.executeWithResult(em -> new ArticleRepository(em).find(id));
+  public static Double getArticlePrice(long id) {
+    var article = JpaUtil.executeWithResult(em -> {
+      var result = new ArticleRepository(em).find(id);
+      if (result != null) {
+        result.getBids().size();//load bids
+      }
+      return result;
+    });
 
     if (article == null) {
       throw new ArticleNotFoundException();
@@ -46,11 +49,12 @@ public class Insights {
 
   }
 
-  private void getTopSellers() {
-
+  public static List<Customer> getTopSellers(int count) {
+    return JpaUtil.executeWithResult(em -> new CustomerRepository(em).getTopSellers(count));
   }
 
-  private void getTopArticles() {
+  public static List<Article> getTopArticles(int count) {
+    return JpaUtil.executeWithResult(em -> new ArticleRepository(em).getTopArticles(count));
   }
 
 }

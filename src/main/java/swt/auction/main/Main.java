@@ -99,7 +99,7 @@ public class Main {
   }
 
   private static Article getArticle(EntityManager em) {
-    var article = new ArticleRepository(em).find(parseLong("articleId"));
+    var article = new ArticleRepository(em).find(promptForLong("articleId"));
     if (article == null) {
       throw new EntityNotFoundException();
     }
@@ -107,7 +107,7 @@ public class Main {
   }
 
   private static Customer getCustomer(EntityManager em) {
-    var customer = new CustomerRepository(em).find(parseLong("customerId"));
+    var customer = new CustomerRepository(em).find(promptForLong("customerId"));
     if (customer == null) {
       throw new EntityNotFoundException();
     }
@@ -127,7 +127,7 @@ public class Main {
   }
 
   private static boolean customerDelete() {
-    return JpaUtil.executeWithResult(em -> new CustomerRepository(em).deleteById(parseLong("customerId")));
+    return JpaUtil.executeWithResult(em -> new CustomerRepository(em).deleteById(promptForLong("customerId")));
   }
 
 
@@ -135,17 +135,17 @@ public class Main {
     Article article = Article.builder()
       .name(promptFor("name"))
       .description(promptFor("description"))
-      .reservePrice(parseDouble("reservePrice"))
-      .hammerPrice(parseDouble("hammerPrice"))
-      .auctionStartDate(parseDateTime("auctionStartDate"))
-      .auctionEndDate(parseDateTime("auctionEndDate"))
-      .status(parseArticleStatus())
+      .reservePrice(promptForDouble("reservePrice"))
+      .hammerPrice(promptForDouble("hammerPrice"))
+      .auctionStartDate(promptForLocalDateTime("auctionStartDate"))
+      .auctionEndDate(promptForLocalDateTime("auctionEndDate"))
+      .status(promptForArticleStatus())
       .build();
 
     JpaUtil.execute(em -> new ArticleRepository(em).save(article));
   }
 
-  private static ArticleStatus parseArticleStatus() {
+  private static ArticleStatus promptForArticleStatus() {
     try {
       return ArticleStatus.valueOf(promptFor("status (LISTED, AUCTION_RUNNING, SOLD, NOT_SOLD)"));
     } catch (IllegalArgumentException e) {
@@ -155,13 +155,13 @@ public class Main {
   }
 
   private static boolean articleDelete() {
-    return JpaUtil.executeWithResult(em -> new ArticleRepository(em).deleteById(parseLong("articleId")));
+    return JpaUtil.executeWithResult(em -> new ArticleRepository(em).deleteById(promptForLong("articleId")));
   }
 
   private static void bidInsert() {
     Bid bid = Bid.builder()
-      .bid(parseDouble("bid"))
-      .date(parseDateTime("date"))
+      .bid(promptForDouble("bid"))
+      .date(promptForLocalDateTime("date"))
       .build();
     bid.setCustomer(JpaUtil.executeWithResult(Main::getCustomer));
     bid.addArticle(JpaUtil.executeWithResult(Main::getArticle));
@@ -171,29 +171,37 @@ public class Main {
 
 
   private static boolean bidDelete() {
-    return JpaUtil.executeWithResult(em -> new BidRepository(em).deleteById(parseLong("id")));
+    return JpaUtil.executeWithResult(em -> new BidRepository(em).deleteById(promptForLong("id")));
   }
 
-  private static Long parseLong(String text) {
+  private static Long promptForLong(String text) {
     try {
       return Long.parseLong(promptFor(text));
     } catch (NumberFormatException e) {
-      System.out.println("Error during parsing!");
-      return parseLong(text);
+      System.out.println("Error during parsing! Default is used (0)");
+      return 0L;
     }
   }
 
-  private static Double parseDouble(String text) {
+  private static Double promptForDouble(String text) {
     try {
       return Double.parseDouble(promptFor(text));
     } catch (NumberFormatException e) {
-      System.out.println("Error during parsing!");
-      return parseDouble(text);
+      System.out.println("Error during parsing! Default is used (0)");
+      return 0D;
     }
   }
 
+  private static Integer promptForInt(String text) {
+    try {
+      return Integer.parseInt(promptFor(text));
+    } catch (NumberFormatException e) {
+      System.out.println("Error during parsing! Default is used (0)");
+      return 0;
+    }
+  }
 
-  private static LocalDateTime parseDateTime(String text) {
+  private static LocalDateTime promptForLocalDateTime(String text) {
     try {
       return LocalDateTime.parse(promptFor(text + " (2007-12-03T10:15:30)"));
     } catch (DateTimeParseException e) {
@@ -201,7 +209,6 @@ public class Main {
       return LocalDateTime.now();
     }
   }
-
 
   private static void insights() {
     String availCmds =
@@ -212,12 +219,16 @@ public class Main {
     while (!"quit".equals(userCmd)) {
       switch (userCmd) {
         case "1":
+          findArticlesByDescriptions();
           break;
         case "2":
+          getArticlePrice();
           break;
         case "3":
+          getTopSellers();
           break;
         case "4":
+          getTopArticles();
           break;
         default:
           System.out.println("ERROR: invalid command");
@@ -228,5 +239,45 @@ public class Main {
     }
   }
 
+  private static void findArticlesByDescriptions() {
+    var articles = Insights.findArticlesByDescription(
+      promptFor("searchPhrase"),
+      promptForDouble("maxReservePrice"),
+      promptForArticleOrder());
+    articles.forEach(System.out::println);
+  }
 
+  private static ArticleOrder promptForArticleOrder() {
+    try {
+      return ArticleOrder.valueOf(promptFor("article order (NAME, RESERVE_PRICE, HAMMER_PRICE, AUCTION_START_DATE)"));
+    } catch (IllegalArgumentException e) {
+      System.out.println("Error during parsing! Default is used (null)");
+      return null;
+    }
+  }
+
+  private static void getArticlePrice() {
+    Double articlePrice = null;
+    try {
+      articlePrice = Insights.getArticlePrice(promptForLong("articleId"));
+    } catch (ArticleNotFoundException e) {
+      System.out.println("Article not found");
+      return;
+    }
+    if (articlePrice == null) {
+      System.out.println("null");
+    } else {
+      System.out.println(articlePrice);
+    }
+  }
+
+  private static void getTopSellers() {
+    var topSellers = Insights.getTopSellers(promptForInt("count"));
+    topSellers.forEach(System.out::println);
+  }
+
+  private static void getTopArticles() {
+    var topArticles = Insights.getTopArticles(promptForInt("count"));
+    topArticles.forEach(System.out::println);
+  }
 }
