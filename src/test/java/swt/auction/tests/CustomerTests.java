@@ -4,6 +4,7 @@ package swt.auction.tests;
 import jakarta.persistence.*;
 import org.junit.jupiter.api.*;
 import swt.auction.entities.*;
+import swt.auction.entities.embeddables.*;
 import swt.auction.repositories.*;
 import swt.auction.repositories.impl.*;
 import swt.auction.util.*;
@@ -24,6 +25,7 @@ public class CustomerTests {
     entityManager = JpaUtil.getTransactionalEntityManager();
     customerRepository = new CustomerRepository(entityManager);
 
+    entityManager.createQuery("delete from Bid ").executeUpdate();
     entityManager.createQuery("delete from Article ").executeUpdate();
     entityManager.createQuery("delete from Customer").executeUpdate();
     JpaUtil.commitAndBegin(entityManager);

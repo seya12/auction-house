@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CascadeType;
 import org.hibernate.annotations.*;
+import swt.auction.entities.embeddables.*;
 
 import java.util.*;
 
@@ -53,5 +54,10 @@ public class Customer extends BaseEntity {
   @Cascade({CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
   @ToString.Exclude
   private List<Article> soldArticles;
+
+  @OneToMany(mappedBy = "customer", orphanRemoval = true)
+  @Cascade(CascadeType.ALL)
+  @ToString.Exclude
+  private List<Bid> bids;
 
 }

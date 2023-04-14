@@ -24,4 +24,22 @@ public class CustomerRepository extends Repository<Customer> {
 
     return entityManager.createQuery(query).setMaxResults(count).getResultList();
   }
+
+  @Override
+  public boolean deleteById(Long primaryKey) {
+    var entity = find(primaryKey);
+
+    if (entity == null) {
+      return false;
+    }
+
+    for (var article : entity.getBoughtArticles()) {
+      article.setBuyer(null);
+    }
+    for (var article : entity.getSoldArticles()) {
+      article.setSeller(null);
+    }
+    entityManager.remove(entity);
+    return true;
+  }
 }

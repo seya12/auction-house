@@ -18,9 +18,8 @@ public class Bid extends BaseEntity {
 
   private LocalDateTime date;
 
-  @OneToOne
-  @JoinColumn(name = "customerId")
-  private Customer bidder;
+  @ManyToOne
+  private Customer customer;
 
   @ManyToOne
   private Article article;

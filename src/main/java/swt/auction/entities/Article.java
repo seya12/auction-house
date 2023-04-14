@@ -2,6 +2,9 @@ package swt.auction.entities;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CascadeType;
+import org.hibernate.annotations.*;
+import swt.auction.entities.enums.*;
 
 import java.time.*;
 import java.util.*;
@@ -35,7 +38,8 @@ public class Article extends BaseEntity {
   @ToString.Exclude
   private Customer buyer;
 
-  @OneToMany(mappedBy = "article", fetch = FetchType.EAGER, orphanRemoval = true)
+  @OneToMany(mappedBy = "article", fetch = FetchType.LAZY, orphanRemoval = true)
+  @Cascade(CascadeType.ALL)
   @ToString.Exclude
   private List<Bid> bids;
 

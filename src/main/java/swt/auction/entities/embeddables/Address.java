@@ -1,4 +1,4 @@
-package swt.auction.entities;
+package swt.auction.entities.embeddables;
 
 import jakarta.persistence.*;
 import lombok.*;

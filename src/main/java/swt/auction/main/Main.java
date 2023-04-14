@@ -2,6 +2,8 @@ package swt.auction.main;
 
 import jakarta.persistence.*;
 import swt.auction.entities.*;
+import swt.auction.entities.embeddables.*;
+import swt.auction.entities.enums.*;
 import swt.auction.repositories.impl.*;
 import swt.auction.util.*;
 
@@ -161,7 +163,7 @@ public class Main {
       .bid(parseDouble("bid"))
       .date(parseDateTime("date"))
       .build();
-    bid.setBidder(JpaUtil.executeWithResult(Main::getCustomer));
+    bid.setCustomer(JpaUtil.executeWithResult(Main::getCustomer));
     bid.addArticle(JpaUtil.executeWithResult(Main::getArticle));
 
     JpaUtil.execute(em -> new BidRepository(em).save(bid));
