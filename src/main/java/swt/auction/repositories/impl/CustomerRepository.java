@@ -8,38 +8,52 @@ import java.util.*;
 
 public class CustomerRepository extends Repository<Customer> {
 
-  public CustomerRepository(EntityManager entityManager) {
-    super(Customer.class, entityManager);
-  }
-
-  public List<Customer> getTopSellers(int count) {
-    var criteriaBuilder = entityManager.getCriteriaBuilder();
-    var query = criteriaBuilder.createQuery(Customer.class);
-    var customer = query.from(Customer.class);
-    var soldArticles = customer.join(Customer_.SOLD_ARTICLES);
-
-    query.multiselect(customer, criteriaBuilder.sum(soldArticles.get(Article_.HAMMER_PRICE)));
-    query.groupBy(customer.get(Customer_.ID));
-    query.orderBy(criteriaBuilder.desc(criteriaBuilder.sum(soldArticles.get(Article_.HAMMER_PRICE))));
-
-    return entityManager.createQuery(query).setMaxResults(count).getResultList();
-  }
-
-  @Override
-  public boolean deleteById(Long primaryKey) {
-    var entity = find(primaryKey);
-
-    if (entity == null) {
-      return false;
+    public CustomerRepository(EntityManager entityManager) {
+        super(Customer.class, entityManager);
     }
 
-    for (var article : entity.getBoughtArticles()) {
-      article.setBuyer(null);
+
+    private class Result {
+        Customer customer;
+        Double sum;
+
+        public Result(Customer customer, Double sum) {
+            this.customer = customer;
+            this.sum = sum;
+        }
     }
-    for (var article : entity.getSoldArticles()) {
-      article.setSeller(null);
+
+    public List<Customer> getTopSellers(int count) {
+        var customers = entityManager.createQuery(
+                        "select customer.id from Customer customer" +
+                                " join customer.soldArticles articles" +
+                                " group by customer.id" +
+                                " order by sum(articles.hammerPrice) desc nulls last", Long.class)
+                .setMaxResults(count)
+                .getResultList();
+
+        var customerList = new ArrayList<Customer>();
+        for (var customerId : customers) {
+            customerList.add(find(customerId));
+        }
+        return customerList;
     }
-    entityManager.remove(entity);
-    return true;
-  }
+
+    @Override
+    public boolean deleteById(Long primaryKey) {
+        var entity = find(primaryKey);
+
+        if (entity == null) {
+            return false;
+        }
+
+        for (var article : entity.getBoughtArticles()) {
+            article.setBuyer(null);
+        }
+        for (var article : entity.getSoldArticles()) {
+            article.setSeller(null);
+        }
+        entityManager.remove(entity);
+        return true;
+    }
 }
