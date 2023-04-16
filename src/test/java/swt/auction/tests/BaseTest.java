@@ -1,0 +1,27 @@
+package swt.auction.tests;
+
+import jakarta.persistence.*;
+import org.junit.jupiter.api.*;
+import swt.auction.util.*;
+
+public abstract class BaseTest {
+
+  protected EntityManager entityManager;
+
+  @BeforeEach
+  void init() {
+    entityManager = JpaUtil.getTransactionalEntityManager();
+    initRepository();
+    deleteEntities();
+  }
+
+  protected abstract void initRepository();
+
+  public void deleteEntities() {
+    entityManager.createQuery("delete from Bid ").executeUpdate();
+    entityManager.createQuery("delete from Article ").executeUpdate();
+    entityManager.createQuery("delete from Customer").executeUpdate();
+    JpaUtil.commitAndBegin(entityManager);
+  }
+
+}

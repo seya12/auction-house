@@ -1,11 +1,9 @@
 package swt.auction.tests;
 
 
-import jakarta.persistence.*;
 import org.junit.jupiter.api.*;
 import swt.auction.entities.*;
 import swt.auction.entities.embeddables.*;
-import swt.auction.repositories.*;
 import swt.auction.repositories.impl.*;
 import swt.auction.util.*;
 
@@ -15,20 +13,13 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 
-public class CustomerTests {
+public class CustomerTests extends BaseTest {
 
-  Repository<Customer> customerRepository;
-  EntityManager entityManager;
+  CustomerRepository customerRepository;
 
-  @BeforeEach
-  void init() {
-    entityManager = JpaUtil.getTransactionalEntityManager();
+  @Override
+  protected void initRepository() {
     customerRepository = new CustomerRepository(entityManager);
-
-    entityManager.createQuery("delete from Bid ").executeUpdate();
-    entityManager.createQuery("delete from Article ").executeUpdate();
-    entityManager.createQuery("delete from Customer").executeUpdate();
-    JpaUtil.commitAndBegin(entityManager);
   }
 
   @Test
@@ -136,10 +127,55 @@ public class CustomerTests {
     assertThat(sizeBefore).isEqualTo(sizeAfter);
   }
 
+
+  @Test
+  void getTopSellersWhenNoCustomerExistsThenEmptyList() {
+    List<Customer> topSellers = customerRepository.getTopSellers(5);
+
+    assertThat(topSellers).isEmpty();
+  }
+
+  @Test
+  void getTopSellersWhenCustomersExistReturnTopSellers() {
+    Customer customerOne = getDefaultCustomer();
+    Customer customerTwo = getDefaultCustomer();
+    Customer customerThree = getDefaultCustomer();
+
+    Article articleOne = new Article();
+    articleOne.setHammerPrice(10D);
+    articleOne.setBids(new ArrayList<>());
+    Article articleTwo = new Article();
+    articleTwo.setHammerPrice(50D);
+    articleTwo.setBids(new ArrayList<>());
+    Article articleThree = new Article();
+    articleThree.setHammerPrice(25D);
+    articleThree.setBids(new ArrayList<>());
+
+    articleOne.addSeller(customerOne);
+    articleTwo.addSeller(customerTwo);
+    articleThree.addSeller(customerThree);
+
+    JpaUtil.execute((em) -> {
+      em.persist(articleOne);
+      em.persist(articleTwo);
+      em.persist(articleThree);
+    });
+
+    List<Customer> topSellers = customerRepository.getTopSellers(3);
+
+    assertAll(
+      () -> assertThat(topSellers.size()).isEqualTo(3),
+      () -> assertThat(topSellers.get(0).getId()).isEqualTo(customerTwo.getId()),
+      () -> assertThat(topSellers.get(1).getId()).isEqualTo(customerThree.getId()),
+      () -> assertThat(topSellers.get(2).getId()).isEqualTo(customerOne.getId())
+             );
+  }
+
   @AfterEach
   void close() {
     entityManager.close();
   }
+
 
   private Customer getDefaultCustomer() {
     var customer = Customer.builder()
@@ -150,6 +186,8 @@ public class CustomerTests {
       .shippingAddress(new Address("4040", "Urfahr", "Rieglstraße"))
       .boughtArticles(new ArrayList<>())
       .soldArticles(new ArrayList<>())
+      .bids(new ArrayList<>())
+      .paymentOptions(new ArrayList<>())
       .build();
 
     customerRepository.save(customer);
