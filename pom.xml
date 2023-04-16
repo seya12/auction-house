@@ -141,6 +141,13 @@
             <artifactId>hibernate-jpamodelgen</artifactId>
             <version>6.1.7.Final</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.4.193</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
 
