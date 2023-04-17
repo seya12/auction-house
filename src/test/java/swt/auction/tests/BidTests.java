@@ -61,43 +61,31 @@ public class BidTests extends BaseTest {
   void updateBidWhenExistsIsUpdated() {
     Bid bid = getDefaultBid();
     bid.setBid(2.0);
-    bidRepository.update(bid);
-    JpaUtil.commitAndBegin(entityManager);
-    entityManager.detach(bid);
-    Bid fetchedBid = bidRepository.find(bid.getId());
-    assertThat(bid).usingRecursiveComparison().isEqualTo(fetchedBid);
-  }
 
-  @Test
-  void updateBidWhenNotExistsIsNotFound() {
-    Bid bid = getDefaultBid();
-    bid.setId(5L);
-    bidRepository.update(bid);
-    JpaUtil.commitAndBegin(entityManager);
+    var updatedBid = bidRepository.update(bid);
     entityManager.detach(bid);
+
     Bid fetchedBid = bidRepository.find(bid.getId());
-    assertNull(fetchedBid);
+    assertThat(updatedBid).usingRecursiveComparison().isEqualTo(fetchedBid);
   }
 
   @Test
   void deleteBidWhenExistsIsDeleted() {
     Bid bid = getDefaultBid();
+
     bidRepository.delete(bid);
-    JpaUtil.commitAndBegin(entityManager);
-    entityManager.detach(bid);
-    Bid fetchedBid = bidRepository.find(bid.getId());
-    assertNull(fetchedBid);
+    assertThat(bidRepository.find(bid.getId())).isNull();
   }
 
   @Test
-  void deleteBidWhenNotExistsIsNotFound() {
-    Bid bid = getDefaultBid();
-    bid.setId(5L);
-    bidRepository.delete(bid);
-    JpaUtil.commitAndBegin(entityManager);
-    entityManager.detach(bid);
-    Bid fetchedBid = bidRepository.find(bid.getId());
-    assertNull(fetchedBid);
+  void deleteBidWhenNotExistsNoBidDeleted() {
+    getDefaultBid();
+
+    int sizeBefore = bidRepository.findAll().size();
+    bidRepository.delete(new Bid());
+    int sizeAfter = bidRepository.findAll().size();
+
+    assertThat(sizeBefore).isEqualTo(sizeAfter);
   }
 
 

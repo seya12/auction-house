@@ -87,7 +87,7 @@ public class CustomerTests extends BaseTest {
   }
 
   @Test
-  void removeWhenCustomerFoundThenDelete() {
+  void deleteWhenCustomerFoundThenDelete() {
     Customer customer = getDefaultCustomer();
 
     customerRepository.delete(customer);
@@ -96,7 +96,7 @@ public class CustomerTests extends BaseTest {
   }
 
   @Test
-  void removeWhenNoCustomerFoundThenNoCustomerDeleted() {
+  void deleteWhenNoCustomerFoundThenNoCustomerDeleted() {
     getDefaultCustomer();
 
     int sizeBefore = customerRepository.findAll().size();
@@ -107,7 +107,7 @@ public class CustomerTests extends BaseTest {
   }
 
   @Test
-  void removeByIdWhenCustomerFoundThenDelete() {
+  void deleteByIdWhenCustomerFoundThenDelete() {
     Customer customer = getDefaultCustomer();
 
     customerRepository.deleteById(customer.getId());
@@ -116,7 +116,7 @@ public class CustomerTests extends BaseTest {
   }
 
   @Test
-  void removeByIdWhenNoCustomerFoundThenNoCustomerDeleted() {
+  void deleteByIdWhenNoCustomerFoundThenNoCustomerDeleted() {
     getDefaultCustomer();
 
     int sizeBefore = customerRepository.findAll().size();
