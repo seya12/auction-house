@@ -4,9 +4,20 @@ import jakarta.persistence.*;
 import org.junit.jupiter.api.*;
 import swt.auction.util.*;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class BaseTest {
 
   protected EntityManager entityManager;
+
+  @BeforeAll
+  void setup() {
+    JpaUtil.getEntityManagerFactory();
+  }
+
+  @AfterAll
+  void tearDown() {
+    JpaUtil.closeEntityManagerFactory();
+  }
 
   @BeforeEach
   void init() {

@@ -39,4 +39,13 @@ public class Bid extends BaseEntity {
     article = null;
   }
 
+  public void addCustomer(Customer customer) {
+    if (customer != null && customer.getBids() != null) {
+      customer.getBids().remove(this);
+    }
+    this.customer = customer;
+    customer.getBids().add(this);
+  }
+
+
 }

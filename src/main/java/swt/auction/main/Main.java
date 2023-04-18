@@ -163,7 +163,7 @@ public class Main {
       .bid(promptForDouble("bid"))
       .date(promptForLocalDateTime("date"))
       .build();
-    bid.setCustomer(JpaUtil.executeWithResult(Main::getCustomer));
+    bid.addCustomer(JpaUtil.executeWithResult(Main::getCustomer));
     bid.addArticle(JpaUtil.executeWithResult(Main::getArticle));
 
     JpaUtil.execute(em -> new BidRepository(em).save(bid));

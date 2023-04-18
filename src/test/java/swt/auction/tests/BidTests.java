@@ -88,7 +88,6 @@ public class BidTests extends BaseTest {
     assertThat(sizeBefore).isEqualTo(sizeAfter);
   }
 
-
   private Bid getDefaultBid() {
     Bid bid = Bid.builder()
       .bid(1.0)
@@ -98,6 +97,5 @@ public class BidTests extends BaseTest {
     entityManager.detach(bid);
     return bid;
   }
-
 
 }
