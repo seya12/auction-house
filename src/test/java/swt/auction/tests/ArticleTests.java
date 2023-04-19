@@ -1,6 +1,7 @@
 package swt.auction.tests;
 
 import org.junit.jupiter.api.*;
+import swt.auction.backend.*;
 import swt.auction.entities.*;
 import swt.auction.entities.enums.*;
 import swt.auction.repositories.impl.*;
@@ -126,7 +127,7 @@ public class ArticleTests extends BaseTest {
 
   @Test
   void findArticlesByDescriptionWhenFoundWithDifferentPriceListIsReturned() {
-    var article = getDefaultArticle();
+    getDefaultArticle();
 
     var articles = articleRepository.findArticlesByDescription("Test", 1D, null);
 

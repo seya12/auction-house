@@ -1,4 +1,4 @@
-package swt.auction.repositories.impl;
+package swt.auction.backend;
 
 import swt.auction.entities.*;
 
@@ -7,7 +7,7 @@ public enum ArticleOrder {
     Article_.AUCTION_START_DATE);
   public final String label;
 
-  private ArticleOrder(String label) {
+  ArticleOrder(String label) {
     this.label = label;
   }
 }

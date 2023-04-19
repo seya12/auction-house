@@ -1,4 +1,4 @@
-package swt.auction.main;
+package swt.auction.backend;
 
 public class ArticleNotFoundException extends RuntimeException {
 }

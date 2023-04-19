@@ -1,6 +1,7 @@
-package swt.auction.main;
+package swt.auction;
 
 import jakarta.persistence.*;
+import swt.auction.backend.*;
 import swt.auction.entities.*;
 import swt.auction.entities.embeddables.*;
 import swt.auction.entities.enums.*;

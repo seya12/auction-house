@@ -1,6 +1,7 @@
 package swt.auction.repositories.impl;
 
 import jakarta.persistence.*;
+import swt.auction.backend.*;
 import swt.auction.entities.*;
 import swt.auction.repositories.*;
 

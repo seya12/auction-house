@@ -7,9 +7,8 @@ import java.util.*;
 
 public abstract class Repository<T extends BaseEntity> {
 
+  private final Class<T> type;
   protected EntityManager entityManager;
-
-  private Class<T> type;
 
   public Repository(Class<T> clazz, EntityManager entityManager) {
     this.type = clazz;
@@ -21,23 +20,23 @@ public abstract class Repository<T extends BaseEntity> {
   }
 
   public T find(Long primaryKey) {
-    if(primaryKey == null){
+    if (primaryKey == null) {
       return null;
     }
-    return (T) entityManager.find(type, primaryKey);
+    return entityManager.find(type, primaryKey);
   }
 
   public List<T> findAll() {
     return entityManager.createQuery("from " + type.getName(), type).getResultList();
   }
 
-  public T update(T entity){
+  public T update(T entity) {
     return entityManager.merge(entity);
 
   }
 
   public boolean delete(T entity) {
-    if(entity == null){
+    if (entity == null) {
       return false;
     }
     return deleteById(entity.getId());
@@ -46,7 +45,7 @@ public abstract class Repository<T extends BaseEntity> {
   public boolean deleteById(Long primaryKey) {
     var entity = find(primaryKey);
 
-    if(entity == null) {
+    if (entity == null) {
       return false;
     }
 
