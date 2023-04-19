@@ -67,19 +67,19 @@ public class Main {
           case "5" -> bidInsert();
           case "6" -> System.out.println(bidDelete() ? "Success" : "Delete failed");
           case "7" -> JpaUtil.execute(em -> {
-            Customer customer = getCustomer(em);
             Article article = getArticle(em);
+            Customer customer = getCustomer(em);
 
             article.addSeller(customer);
           });
-          case "8" -> JpaUtil.execute(em -> { //TODO: Testcase - currently article is deleted
+          case "8" -> JpaUtil.execute(em -> {
             var article = getArticle(em);
 
             article.removeSeller();
           });
           case "9" -> JpaUtil.execute(em -> {
-            Customer customer = getCustomer(em);
             Article article = getArticle(em);
+            Customer customer = getCustomer(em);
 
             article.addBuyer(customer);
           });
@@ -163,10 +163,12 @@ public class Main {
       .bid(promptForDouble("bid"))
       .date(promptForLocalDateTime("date"))
       .build();
-    bid.addCustomer(JpaUtil.executeWithResult(Main::getCustomer));
-    bid.addArticle(JpaUtil.executeWithResult(Main::getArticle));
 
-    JpaUtil.execute(em -> new BidRepository(em).save(bid));
+    JpaUtil.execute(em -> {
+      bid.addCustomer(getCustomer(em));
+      bid.addArticle(getArticle(em));
+      new BidRepository(em).save(bid);
+    });
   }
 
 
@@ -192,9 +194,9 @@ public class Main {
     }
   }
 
-  private static Integer promptForInt(String text) {
+  private static Integer promptForInt() {
     try {
-      return Integer.parseInt(promptFor(text));
+      return Integer.parseInt(promptFor("count"));
     } catch (NumberFormatException e) {
       System.out.println("Error during parsing! Default is used (0)");
       return 0;
@@ -218,21 +220,11 @@ public class Main {
     String userCmd = promptFor("");
     while (!"quit".equals(userCmd)) {
       switch (userCmd) {
-        case "1":
-          findArticlesByDescriptions();
-          break;
-        case "2":
-          getArticlePrice();
-          break;
-        case "3":
-          getTopSellers();
-          break;
-        case "4":
-          getTopArticles();
-          break;
-        default:
-          System.out.println("ERROR: invalid command");
-          break;
+        case "1" -> findArticlesByDescriptions();
+        case "2" -> getArticlePrice();
+        case "3" -> getTopSellers();
+        case "4" -> getTopArticles();
+        default -> System.out.println("ERROR: invalid command");
       }
       System.out.println(availCmds);
       userCmd = promptFor("");
@@ -257,7 +249,7 @@ public class Main {
   }
 
   private static void getArticlePrice() {
-    Double articlePrice = null;
+    Double articlePrice;
     try {
       articlePrice = Insights.getArticlePrice(promptForLong("articleId"));
     } catch (ArticleNotFoundException e) {
@@ -272,12 +264,12 @@ public class Main {
   }
 
   private static void getTopSellers() {
-    var topSellers = Insights.getTopSellers(promptForInt("count"));
+    var topSellers = Insights.getTopSellers(promptForInt());
     topSellers.forEach(System.out::println);
   }
 
   private static void getTopArticles() {
-    var topArticles = Insights.getTopArticles(promptForInt("count"));
+    var topArticles = Insights.getTopArticles(promptForInt());
     topArticles.forEach(System.out::println);
   }
 }

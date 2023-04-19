@@ -25,7 +25,7 @@ public class RelationshipTest extends BaseTest {
   }
 
   @Test
-  void deleteCustomerBuyerArticleExistsBidDeleted() {
+  void deleteCustomerThenBuyerArticleExistsBidDeleted() {
     var buyer = getDefaultCustomer();
     var seller = getDefaultCustomer();
     var article = getDefaultArticle(seller, buyer);
@@ -40,7 +40,7 @@ public class RelationshipTest extends BaseTest {
   }
 
   @Test
-  void deleteCustomerSellerArticleExistsBidNotDeleted() {
+  void deleteCustomerThenSellerArticleExistsBidNotDeleted() {
     var buyer = getDefaultCustomer();
     var seller = getDefaultCustomer();
     var article = getDefaultArticle(seller, buyer);
@@ -52,6 +52,21 @@ public class RelationshipTest extends BaseTest {
     assertThat(articleRepository.find(article.getId())).isNotNull();
     assertThat(articleRepository.find(article.getId()).getSeller()).isNull();
     assertThat(customerRepository.find(seller.getId())).isNull();
+  }
+
+  @Test
+  void deleteArticleThenCustomerExistsBidDeleted() {
+    var buyer = getDefaultCustomer();
+    var seller = getDefaultCustomer();
+    var article = getDefaultArticle(seller, buyer);
+    var bid = getDefaultBid(buyer, article);
+
+    articleRepository.delete(article);
+
+    assertThat(bidRepository.find(bid.getId())).isNull();
+    assertThat(articleRepository.find(article.getId())).isNull();
+    assertThat(customerRepository.find(seller.getId())).isNotNull();
+    assertThat(customerRepository.find(buyer.getId())).isNotNull();
   }
 
 
@@ -70,7 +85,6 @@ public class RelationshipTest extends BaseTest {
 
     customerRepository.save(customer);
     JpaUtil.commitAndBegin(entityManager);
-    entityManager.detach(customer);
 
     return customer;
   }
@@ -86,10 +100,12 @@ public class RelationshipTest extends BaseTest {
       .status(ArticleStatus.SOLD)
       .bids(new ArrayList<>())
       .build();
+
     article.addSeller(seller);
     article.addBuyer(buyer);
     articleRepository.save(article);
     JpaUtil.commitAndBegin(entityManager);
+
     return article;
   }
 
@@ -102,7 +118,7 @@ public class RelationshipTest extends BaseTest {
     bid.addArticle(article);
     bidRepository.save(bid);
     JpaUtil.commitAndBegin(entityManager);
-    entityManager.detach(bid);
+    
     return bid;
   }
 }
